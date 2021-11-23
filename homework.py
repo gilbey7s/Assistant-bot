@@ -26,7 +26,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 1
+RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
@@ -127,7 +127,7 @@ def check_re_message(msg, re_msg):
 def main():
     """Основная логика работы бота."""
     tokens_access = check_tokens()
-    if tokens_access != True:
+    if not tokens_access:
         print('Программа не может работать.'
               'Токены не доступны, проверьте файл <.env>'
               )
@@ -144,7 +144,7 @@ def main():
                 time.sleep(RETRY_TIME)
             else:
                 msg = parse_status(HWs[0])
-                if check_re_message(msg, re_msg) == False:
+                if not check_re_message(msg, re_msg):
                     send_message(bot, msg)
                     re_msg = msg
                     time.sleep(RETRY_TIME)
@@ -152,7 +152,7 @@ def main():
         except Exception as error:
             msg = f'Сбой в работе программы: {error}'
             logging.error(f'Ошибка в работе бота: {msg}')
-            if check_re_message(msg, re_msg) == False:
+            if not check_re_message(msg, re_msg):
                 send_message(bot, msg)
                 re_msg = msg
                 time.sleep(RETRY_TIME)
