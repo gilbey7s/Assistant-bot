@@ -39,16 +39,16 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(bot, message):
-    """Отправка сообщения в чат Telegram"""
+    """Отправка сообщения в чат Telegram."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
-        logger.info(f'Сообщение отправлено в чат')
+        logger.info('Сообщение отправлено в чат')
     except telegram.TelegramError as error:
         logger.error(f'Невозможно отправить сообщение в чат: {error}')
 
 
 def get_api_answer(current_timestamp):
-    """Запрос к эндпоинту YandexPracticum"""
+    """Запрос к эндпоинту YandexPracticum."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     logger.info(f'Попытка запроса к эндпоинту {ENDPOINT}')
@@ -69,7 +69,7 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
-    """Проверка ответа API на корректность"""
+    """Проверка ответа API на корректность."""
     if not isinstance(response['homeworks'], list):
         text = 'В ответе значения не приведены к list'
         logging.error(text)
@@ -82,7 +82,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Парсинг статуса работы"""
+    """Парсинг статуса работы."""
     try:
         homework_name = homework['homework_name']
         homework_status = homework['status']
@@ -104,7 +104,7 @@ def parse_status(homework):
 
 
 def check_tokens():
-    """Проверка переменных окружения"""
+    """Проверка переменных окружения."""
     if None != (
             PRACTICUM_TOKEN
             and TELEGRAM_TOKEN
@@ -118,7 +118,7 @@ def check_tokens():
 
 
 def check_re_message(msg, re_msg):
-    """Проверка сообщения на повтор"""
+    """Проверка сообщения на повтор."""
     if msg == re_msg:
         return True
     return False
