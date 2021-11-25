@@ -54,15 +54,15 @@ def get_api_answer(current_timestamp):
     logger.info(f'Попытка запроса к эндпоинту {ENDPOINT}')
     try:
         response = requests.get(ENDPOINT, params=params, headers=HEADERS)
-    except requests.exceptions.HTTPError as error:
+    except requests.exceptions.RequestException as error:
         text = f'Ошибка, статус запроса - {error}'
         logger.error(text)
+        raise requests.exceptions.RequestException(text)
     if response.status_code != 200:
         text = (
             f'От эндпоинта: {ENDPOINT}, пришел ответ отличный от нормы.'
             f' Код ответа: {response.status_code}.'
         )
-        logger.error(text)
         raise ConnectionError(text)
     logger.info(f'Успешный ответ от эндпоинта {ENDPOINT}')
     return response.json()
@@ -114,8 +114,8 @@ def main():
                 logger.debug('У работы не изменился статус.')
             else:
                 msg = parse_status(homeworks[0])
-                if msg != re_msg:
-                    send_message(bot, msg)
+                send_message(bot, msg)
+                re_msg = None
             current_timestamp = response['current_date']
         except Exception as error:
             msg = f'Сбой в работе программы: {error}'
@@ -123,7 +123,6 @@ def main():
             if msg != re_msg:
                 send_message(bot, msg)
                 re_msg = msg
-        re_msg = None
         time.sleep(RETRY_TIME)
 
 
