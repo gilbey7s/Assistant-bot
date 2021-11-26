@@ -38,6 +38,10 @@ HOMEWORK_STATUSES = {
 }
 
 
+class PracticumServerUnavailable:
+    '''Ошибка доступа к ресурсу'''
+
+
 def send_message(bot, message):
     """Отправка сообщения в чат Telegram."""
     try:
@@ -56,14 +60,13 @@ def get_api_answer(current_timestamp):
         response = requests.get(ENDPOINT, params=params, headers=HEADERS)
     except requests.exceptions.RequestException as error:
         text = f'Ошибка, статус запроса - {error}'
-        logger.error(text)
-        raise requests.exceptions.RequestException(text)
+        raise PracticumServerUnavailable(text)
     if response.status_code != 200:
         text = (
             f'От эндпоинта: {ENDPOINT}, пришел ответ отличный от нормы.'
             f' Код ответа: {response.status_code}.'
         )
-        raise ConnectionError(text)
+        raise PracticumServerUnavailable(text)
     logger.info(f'Успешный ответ от эндпоинта {ENDPOINT}')
     return response.json()
 
@@ -89,7 +92,11 @@ def parse_status(homework):
 
 def check_tokens():
     """Проверка переменных окружения."""
-    if PRACTICUM_TOKEN and TELEGRAM_TOKEN and TELEGRAM_CHAT_ID is not None:
+    if (
+        PRACTICUM_TOKEN is not None
+        and TELEGRAM_TOKEN is not None
+        and TELEGRAM_CHAT_ID is not None
+    ):
         return True
     logger.critical('Переменные окружения не доступны,'
                     'проверьте их наличие в файле .env'
@@ -115,8 +122,8 @@ def main():
             else:
                 msg = parse_status(homeworks[0])
                 send_message(bot, msg)
-                re_msg = None
             current_timestamp = response['current_date']
+            re_msg = None
         except Exception as error:
             msg = f'Сбой в работе программы: {error}'
             logging.error(f'Ошибка в работе бота: {msg}')
