@@ -39,7 +39,7 @@ HOMEWORK_STATUSES = {
 
 
 class PracticumServerUnavailable:
-    '''Ошибка доступа к ресурсу'''
+    """Ошибка доступа к ресурсу."""
 
 
 def send_message(bot, message):
